@@ -477,9 +477,14 @@ void WaypointManager::processFeedback(const visualization_msgs::InteractiveMarke
         uint32_t waypoint_id = std::stoul(id_str);
         ROS_INFO("detected waypoint_id: %d", waypoint_id);
         // Create navigation request
-        waypoint_manager::NavigateToWaypoint srv;
-        srv.request.waypoint_id = waypoint_id;
 
+        
+        waypoint_manager::NavigateToWaypoint srv;
+        srv.request.waypoint_id = waypoint_id; //waypoint_id;
+        navigate_to_waypoint_client_.waitForExistence();
+        ROS_INFO("navigate_to_waypoint_client_  calling service");
+        navigate_to_waypoint_client_.call(srv);
+        ROS_INFO("Navigation result: %s", srv.response.message.c_str());
         // if (navigate_to_waypoint_client_.call(srv)) {
         //     ROS_INFO("Navigation result: %s", srv.response.message.c_str());
         // } else {
