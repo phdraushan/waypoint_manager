@@ -453,27 +453,28 @@ void WaypointManager::processFeedback1(const visualization_msgs::InteractiveMark
 }
 
 void WaypointManager::processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback) {
-    ROS_INFO("---------------processFeedback  start-----------------");   
+    // ROS_INFO("---------------processFeedback  start-----------------");   
     // Log the feedback event type and marker name for debugging
-    ROS_INFO("Received feedback for marker: %s", feedback->marker_name.c_str());
-    ROS_INFO("Event type: %d", feedback->event_type);
+    // ROS_INFO("Received feedback for marker: %s", feedback->marker_name.c_str());
+    // ROS_INFO("Event type: %d", feedback->event_type);
     
     // Print more detailed feedback information
-    switch(feedback->event_type) {
-        case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
-            ROS_INFO("Button clicked on waypoint marker!");
-            break;
-        case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
-            ROS_INFO("Mouse down on waypoint marker");
-            break;
-        case visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP:
-            ROS_INFO("Mouse up on waypoint marker");
-            break;
-        default:
-            ROS_INFO("Other interaction with waypoint marker");
-            break;
-    }
+    // switch(feedback->event_type) {
+    //     case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
+    //         ROS_INFO("Button clicked on waypoint marker!");
+    //         break;
+    //     case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
+    //         ROS_INFO("Mouse down on waypoint marker");
+    //         break;
+    //     case visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP:
+    //         ROS_INFO("Mouse up on waypoint marker");
+    //         break;
+    //     default:
+    //         ROS_INFO("Other interaction with waypoint marker");
+    //         break;
+    // }
     if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK) {
+        ROS_INFO("feedback->event_type: %d \t button clicked on waypoint marker", feedback->event_type);
         // Extract waypoint ID from marker name
         std::string id_str = feedback->marker_name.substr(9); // Remove "waypoint_" prefix
         uint32_t waypoint_id = std::stoul(id_str);
@@ -482,13 +483,13 @@ void WaypointManager::processFeedback(const visualization_msgs::InteractiveMarke
         waypoint_manager::NavigateToWaypoint srv;
         srv.request.waypoint_id = waypoint_id;
 
-        if (navigate_to_waypoint_client_.call(srv)) {
-            ROS_INFO("Navigation result: %s", srv.response.message.c_str());
-        } else {
-            ROS_ERROR("Failed to call navigate_to_waypoint service");
-        }
+        // if (navigate_to_waypoint_client_.call(srv)) {
+        //     ROS_INFO("Navigation result: %s", srv.response.message.c_str());
+        // } else {
+        //     ROS_ERROR("Failed to call navigate_to_waypoint service");
+        // }
     }
-    ROS_INFO("---------------processFeedback  end-----------------");   
+    // ROS_INFO("---------------processFeedback  end-----------------");   
 }
 
 int main(int argc, char** argv) {
