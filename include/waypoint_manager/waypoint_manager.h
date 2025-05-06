@@ -36,6 +36,7 @@ private:
     ros::ServiceServer get_waypoints_srv_;
     ros::ServiceServer navigate_to_waypoint_srv_;
     ros::ServiceClient navigate_to_waypoint_client_;
+    ros::ServiceClient create_waypoint_client_;
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
     interactive_markers::InteractiveMarkerServer* marker_server_;
@@ -54,6 +55,7 @@ private:
 
     // Callback functions
     void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
+    void publishPointCallback(const geometry_msgs::PointStamped::ConstPtr& msg);
     bool createWaypointCallback(waypoint_manager::CreateWaypoint::Request& req,
                               waypoint_manager::CreateWaypoint::Response& res);
     bool getWaypointsCallback(waypoint_manager::GetWaypoints::Request& req,

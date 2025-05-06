@@ -8,9 +8,6 @@
 #include <interactive_markers/interactive_marker_server.h>
 
 
-
-
-
 WaypointManager::WaypointManager(ros::NodeHandle& nh) : 
     nh_(nh),
     tf_listener_(tf_buffer_),
@@ -23,42 +20,33 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     nh_.param("distance_threshold", distance_threshold_, 2.0);
     nh_.param("angle_threshold", angle_threshold_, M_PI/4.0); // 45 degrees
 
-    // Initialize ROS components
+    // publishers and subscribers
     odom_sub_ = nh_.subscribe("odom", 1, &WaypointManager::odomCallback, this);
     marker_pub_ = nh_.advertise<visualization_msgs::Marker>("waypoint_markers", 1);
+    publish_point_sub_ = nh_.subscribe("clicked_point", 1, &WaypointManager::publishPointCallback, this);
     
-    // 1. Services provide guaranteed request-response semantics - the client knows 
-    // whether the waypoint creation succeeded or failed
-    
-    // 2. Services are synchronous - the client waits for confirmation that the 
-    // waypoint was created before continuing
-    
-    // 3. Services allow returning error messages and status codes to handle failures
-    
-    // 4. Creating waypoints is not a continuous stream of data that needs constant 
-    // monitoring (which would be better suited for pub/sub)
-    
-    
+    // services
     create_waypoint_srv_ = nh_.advertiseService("create_waypoint", &WaypointManager::createWaypointCallback, this);
     get_waypoints_srv_ = nh_.advertiseService("get_waypoints", &WaypointManager::getWaypointsCallback, this);
     navigate_to_waypoint_srv_ = nh_.advertiseService("navigate_to_waypoint", &WaypointManager::navigateToWaypointCallback, this);
+    
+    // clients
     navigate_to_waypoint_client_ = nh_.serviceClient<waypoint_manager::NavigateToWaypoint>("navigate_to_waypoint");
-
-    // Initialize interactive marker server
+    create_waypoint_client_ = nh_.serviceClient<waypoint_manager::CreateWaypoint>("create_waypoint");
+    
+    // interactive marker server
     marker_server_ = new interactive_markers::InteractiveMarkerServer("waypoint_markers");
 
-    // Load existing waypoints
+
     loadWaypoints();
 
     // Wait for move_base action server
     ROS_INFO("Waiting for move_base action server...");
     move_base_client_.waitForServer();
     ROS_INFO("move_base action server connected!");
-
-    ROS_INFO("WaypointManager initialized!");
     
-    // ros::spin(); // used for testing 
-
+    
+    ROS_INFO("WaypointManager initialized!");
 }
 //tested
 WaypointManager::~WaypointManager() {
