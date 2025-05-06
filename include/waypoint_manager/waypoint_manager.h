@@ -37,7 +37,6 @@ private:
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
     interactive_markers::InteractiveMarkerServer* marker_server_;
-    interactive_markers::InteractiveMarkerServer* simple_marker_server_;
 
     // Action client for move_base
     actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> move_base_client_;
