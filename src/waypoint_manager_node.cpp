@@ -65,7 +65,7 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     ROS_INFO("--------------simple marker------------------");
 
     // interactive_markers::InteractiveMarkerServer server("simple_marker");
-    interactive_markers::InteractiveMarkerServer* simple_marker_server_;
+    // interactive_markers::InteractiveMarkerServer* simple_marker_server_;
     simple_marker_server_ = new interactive_markers::InteractiveMarkerServer("simple_marker");
 
   // create an interactive marker for our server
@@ -73,9 +73,16 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     int_marker.header.frame_id = "map";
     int_marker.header.stamp=ros::Time::now();
     int_marker.name = "my_marker";
-    int_marker.description = "Simple 1-DOF Control";
+    int_marker.description = "clickable_marker_test";
 
-    // create a grey box marker
+    // BUTTON control
+    visualization_msgs::InteractiveMarkerControl button_control;
+    button_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::BUTTON;
+    button_control.name = "button_control";
+    button_control.always_visible = true;
+    int_marker.controls.push_back(button_control);
+
+    // Box marker control
     visualization_msgs::Marker box_marker;
     box_marker.type = visualization_msgs::Marker::CUBE;
     box_marker.scale.x = 0.45;
@@ -85,34 +92,19 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     box_marker.color.g = 0.5;
     box_marker.color.b = 0.5;
     box_marker.color.a = 1.0;
+    button_control.markers.push_back(box_marker);
+    int_marker.controls.push_back(button_control);
 
-    // create a non-interactive control which contains the box
-    visualization_msgs::InteractiveMarkerControl box_control;
-    box_control.always_visible = true;
-    box_control.markers.push_back( box_marker );
+    // visualization_msgs::InteractiveMarkerControl box_control;
+    // box_control.always_visible = true;
 
-    // add the control to the interactive marker
-    int_marker.controls.push_back( box_control );
-
-    // create a control which will move the box
-    // this control does not contain any markers,
-    // which will cause RViz to insert two arrows
-    visualization_msgs::InteractiveMarkerControl rotate_control;
-    rotate_control.name = "move_x";
-    rotate_control.interaction_mode =
-        visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-
-    // add the control to the interactive marker
-    int_marker.controls.push_back(rotate_control);
-
-    // add the interactive marker to our collection &
-    // tell the server to call processFeedback() when feedback arrives for it
+    // Insert and register callback
     simple_marker_server_->insert(int_marker, boost::bind(&WaypointManager::processFeedback1, this, _1));
 
     // 'commit' changes and send to all clients
     simple_marker_server_->applyChanges();
     
-    // ros::spin();
+    // ros::spin(); // used for testing 
 }
 //tested
 WaypointManager::~WaypointManager() {
@@ -504,9 +496,11 @@ std::vector<uint32_t> WaypointManager::findPath(uint32_t start_id, uint32_t goal
 
 void WaypointManager::processFeedback1(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
-  ROS_INFO_STREAM( feedback->marker_name << " is now at "
-      << feedback->pose.position.x << ", " << feedback->pose.position.y
-      << ", " << feedback->pose.position.z );
+    ROS_INFO("---------------processFeedback1  start-----------------");   
+ if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK) {
+        ROS_INFO("Marker was clicked!");
+    }
+    ROS_INFO("---------------processFeedback1  end-----------------");   
 }
 
 void WaypointManager::processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback) {
