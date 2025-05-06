@@ -50,8 +50,7 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     navigate_to_waypoint_client_ = nh_.serviceClient<waypoint_manager::NavigateToWaypoint>("navigate_to_waypoint");
 
     // Initialize interactive marker server
-    
-    interactive_markers::InteractiveMarkerServer marker_server_{"waypoint_markers"};
+    marker_server_ = new interactive_markers::InteractiveMarkerServer("waypoint_markers");
 
     // Load existing waypoints
     loadWaypoints();
@@ -62,47 +61,6 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     ROS_INFO("move_base action server connected!");
 
     ROS_INFO("WaypointManager initialized!");
-    ROS_INFO("--------------simple marker------------------");
-
-    // interactive_markers::InteractiveMarkerServer server("simple_marker");
-    // interactive_markers::InteractiveMarkerServer* simple_marker_server_;
-    simple_marker_server_ = new interactive_markers::InteractiveMarkerServer("simple_marker");
-
-  // create an interactive marker for our server
-    visualization_msgs::InteractiveMarker int_marker;
-    int_marker.header.frame_id = "map";
-    int_marker.header.stamp=ros::Time::now();
-    int_marker.name = "my_marker";
-    int_marker.description = "clickable_marker_test";
-
-    // BUTTON control
-    visualization_msgs::InteractiveMarkerControl button_control;
-    button_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::BUTTON;
-    button_control.name = "button_control";
-    button_control.always_visible = true;
-    int_marker.controls.push_back(button_control);
-
-    // Box marker control
-    visualization_msgs::Marker box_marker;
-    box_marker.type = visualization_msgs::Marker::CUBE;
-    box_marker.scale.x = 0.45;
-    box_marker.scale.y = 0.45;
-    box_marker.scale.z = 0.45;
-    box_marker.color.r = 0.5;
-    box_marker.color.g = 0.5;
-    box_marker.color.b = 0.5;
-    box_marker.color.a = 1.0;
-    button_control.markers.push_back(box_marker);
-    int_marker.controls.push_back(button_control);
-
-    // visualization_msgs::InteractiveMarkerControl box_control;
-    // box_control.always_visible = true;
-
-    // Insert and register callback
-    simple_marker_server_->insert(int_marker, boost::bind(&WaypointManager::processFeedback1, this, _1));
-
-    // 'commit' changes and send to all clients
-    simple_marker_server_->applyChanges();
     
     // ros::spin(); // used for testing 
 }
@@ -110,7 +68,7 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
 WaypointManager::~WaypointManager() {
     saveWaypoints();
     // raushantodo:  check the delete function later 
-    // delete marker_server_;
+    delete marker_server_;
       delete simple_marker_server_;
 }
 //tested
@@ -267,56 +225,47 @@ void WaypointManager::updateVisualization() {
 
     for (const auto& pair : waypoints_) {
         const waypoint_manager::Waypoint& waypoint = pair.second;
-
         // Create interactive marker
         visualization_msgs::InteractiveMarker int_marker;
         int_marker.header.frame_id = "map";
         int_marker.header.stamp = ros::Time::now();
+        //check1
         int_marker.name = "waypoint_" + std::to_string(waypoint.id);
         int_marker.description = waypoint.name;
         int_marker.pose = waypoint.pose;
-        // ROS_INFO("---------------visualization  -----------------");   
-        // ROS_INFO("waypoint: %s", waypoint.name.c_str());
-        // ROS_INFO("pose: %f, %f, %f", waypoint.pose.position.x, waypoint.pose.position.y, waypoint.pose.position.z);
-        // ROS_INFO("---------------visualization  -----------------");   
 
-        // Create button control
         visualization_msgs::InteractiveMarkerControl button_control;
         button_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::BUTTON;
         button_control.name = "button_" + std::to_string(waypoint.id);
-        ROS_INFO("button_control.name: %s", button_control.name.c_str());
+        // ROS_INFO("button_control.name: %s", button_control.name.c_str());
         button_control.always_visible = true;
-
-        // Create marker control
-        visualization_msgs::InteractiveMarkerControl control;
-        control.always_visible = true;
+        int_marker.controls.push_back(button_control);
 
         // Create marker
-        visualization_msgs::Marker marker;
-        marker.type = visualization_msgs::Marker::ARROW;
-        marker.scale.x = 0.5;
-        marker.scale.y = 0.1;
-        marker.scale.z = 0.1;
-        marker.color.r = waypoint.creation_type == waypoint_manager::Waypoint::CREATION_TYPE_MANUAL ? 1.0 : 0.0;
-        marker.color.g = waypoint.creation_type == waypoint_manager::Waypoint::CREATION_TYPE_MANUAL ? 0.0 : 1.0;
-        marker.color.b = 0.0;
-        marker.color.a = 1.0;
+        visualization_msgs::Marker box_marker;
+        box_marker.type = visualization_msgs::Marker::CUBE;
+        box_marker.scale.x = 0.5;
+        box_marker.scale.y = 0.5;
+        box_marker.scale.z = 0.5;
+        // different color for manual and auto waypoints
+        if (waypoint.creation_type == waypoint_manager::Waypoint::CREATION_TYPE_MANUAL) {
+            box_marker.color.r = 1.0;
+            box_marker.color.g = 0.0;
+        } else {
+            box_marker.color.r = 0.0;
+            box_marker.color.g = 1.0;
+        }
+        box_marker.color.b = 0.0;
+        box_marker.color.a = 1.0;
 
-        control.markers.push_back(marker);
-
-        // Clear and add controls in correct order
-        int_marker.controls.clear();
+        button_control.markers.push_back(box_marker);
+        // int_marker.controls.clear();
         int_marker.controls.push_back(button_control);
-        int_marker.controls.push_back(control);
 
-        // marker_server_.insert(int_marker);
-        // ROS_INFO("Registering callback for marker: %s", int_marker.name.c_str());
-                
-        
-        // marker_server_.setCallback(int_marker.name, boost::bind(&WaypointManager::processFeedback, this, _1));
+        marker_server_->insert(int_marker, boost::bind(&WaypointManager::processFeedback, this, _1));
     }
+        marker_server_->applyChanges();
 
-    // marker_server_.applyChanges();
 }
 //tested
 void WaypointManager::saveWaypoints() {
