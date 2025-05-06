@@ -41,11 +41,6 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     
     create_waypoint_srv_ = nh_.advertiseService("create_waypoint", &WaypointManager::createWaypointCallback, this);
     get_waypoints_srv_ = nh_.advertiseService("get_waypoints", &WaypointManager::getWaypointsCallback, this);
-    // The goal data for navigate_to_waypoint_srv_ comes from:
-    // 1. Interactive marker feedback in processFeedback() when user clicks a waypoint
-    // 2. Direct service calls to /navigate_to_waypoint with a waypoint ID
-    // The service handler navigateToWaypointCallback() processes these requests
-    // and uses move_base to navigate to the selected waypoint
     navigate_to_waypoint_srv_ = nh_.advertiseService("navigate_to_waypoint", &WaypointManager::navigateToWaypointCallback, this);
     navigate_to_waypoint_client_ = nh_.serviceClient<waypoint_manager::NavigateToWaypoint>("navigate_to_waypoint");
 
@@ -63,13 +58,13 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     ROS_INFO("WaypointManager initialized!");
     
     // ros::spin(); // used for testing 
+
 }
 //tested
 WaypointManager::~WaypointManager() {
     saveWaypoints();
     // raushantodo:  check the delete function later 
     delete marker_server_;
-      delete simple_marker_server_;
 }
 //tested
 void WaypointManager::odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
@@ -133,10 +128,12 @@ bool WaypointManager::getWaypointsCallback(waypoint_manager::GetWaypoints::Reque
 }
 
 
-
 bool WaypointManager::navigateToWaypointCallback(waypoint_manager::NavigateToWaypoint::Request& req,
                                                waypoint_manager::NavigateToWaypoint::Response& res) {
+    
+    ROS_INFO("navigateToWaypointCallback: %d", req.waypoint_id);
     if (waypoints_.find(req.waypoint_id) == waypoints_.end()) {
+        ROS_ERROR("Waypoint not found: %d", req.waypoint_id);
         res.success = false;
         res.message = "Waypoint not found";
         return false;
@@ -478,7 +475,7 @@ void WaypointManager::processFeedback(const visualization_msgs::InteractiveMarke
         // Extract waypoint ID from marker name
         std::string id_str = feedback->marker_name.substr(9); // Remove "waypoint_" prefix
         uint32_t waypoint_id = std::stoul(id_str);
-
+        ROS_INFO("detected waypoint_id: %d", waypoint_id);
         // Create navigation request
         waypoint_manager::NavigateToWaypoint srv;
         srv.request.waypoint_id = waypoint_id;
