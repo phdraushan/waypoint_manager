@@ -67,6 +67,20 @@ WaypointManager::~WaypointManager() {
     delete marker_server_;
 }
 //tested
+
+
+
+void WaypointManager::publishPointCallback(const geometry_msgs::PointStamped::ConstPtr& msg) {
+    ROS_INFO("\n\n--------------------------------\n\n");
+    ROS_INFO("publishPointCallback: %f, %f, %f", msg->point.x, msg->point.y, msg->point.z);
+    
+    waypoint_manager::CreateWaypoint create_waypoint_srv;
+    create_waypoint_srv.request.name = "Manual Waypoint " + std::to_string(next_waypoint_id_);
+    create_waypoint_client_.call(create_waypoint_srv);
+    ROS_INFO("create_waypoint_srv: %s", create_waypoint_srv.response.message.c_str());
+    ROS_INFO("--------------------------------");
+}
+
 void WaypointManager::odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
     if (is_first_pose_) {
         last_pose_ = msg->pose.pose;
@@ -158,7 +172,7 @@ bool WaypointManager::navigateToWaypointCallback(waypoint_manager::NavigateToWay
         return false;
     }
 
-    // Find closest waypoint to current position
+    // Find closest waypoint to current pose
     uint32_t start_id = 0;
     double min_distance = std::numeric_limits<double>::max();
     for (const auto& pair : waypoints_) {

@@ -29,6 +29,7 @@ private:
     // ROS related members
     ros::NodeHandle& nh_;
     ros::Subscriber odom_sub_;
+    ros::Subscriber publish_point_sub_;
     ros::Publisher marker_pub_;
     ros::ServiceServer create_waypoint_srv_;
     ros::ServiceServer get_waypoints_srv_;
