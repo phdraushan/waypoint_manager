@@ -188,7 +188,7 @@ bool WaypointManager::navigateToWaypointCallback(waypoint_manager::NavigateToWay
         goal.target_pose.pose = waypoints_[path[i]].pose;
 
         move_base_client_.sendGoal(goal);
-        move_base_client_.waitForResult();
+        // move_base_client_.waitForResult();
 
         if (move_base_client_.getState() != actionlib::SimpleClientGoalState::SUCCEEDED) {
             res.success = false;
