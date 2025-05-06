@@ -493,6 +493,8 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "waypoint_manager");
     ros::NodeHandle nh;
     WaypointManager waypoint_manager(nh);
-    ros::spin();
+    ros::AsyncSpinner spinner(2); // client is blocking the thread
+    spinner.start();
+    ros::waitForShutdown();
     return 0;
 } 
