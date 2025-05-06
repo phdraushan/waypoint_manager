@@ -453,6 +453,84 @@ std::vector<uint32_t> WaypointManager::findPath(uint32_t start_id, uint32_t goal
     return std::vector<uint32_t>();
 }
 
+std::vector<uint32_t> WaypointManager::findPathDijkstra(uint32_t start_id, uint32_t goal_id) {
+    std::map<uint32_t, double> dist;
+    std::map<uint32_t, uint32_t> prev;
+    std::set<uint32_t> visited;
+    using Pair = std::pair<double, uint32_t>;
+    std::priority_queue<Pair, std::vector<Pair>, std::greater<Pair>> pq;
+
+    for (const auto& wp : waypoints_) {
+        dist[wp.first] = std::numeric_limits<double>::infinity();
+    }
+    dist[start_id] = 0.0;
+    pq.push({0.0, start_id});
+
+    while (!pq.empty()) {
+        auto [d, u] = pq.top(); pq.pop();
+        if (visited.count(u)) continue;
+        visited.insert(u);
+
+        if (u == goal_id) break;
+
+        for (const auto& v : waypoints_) {
+            if (u == v.first) continue;
+            double cost = calculateDistance(waypoints_[u].pose, waypoints_[v.first].pose);
+            if (dist[u] + cost < dist[v.first]) {
+                dist[v.first] = dist[u] + cost;
+                prev[v.first] = u;
+                pq.push({dist[v.first], v.first});
+            }
+        }
+    }
+
+    // Reconstruct path
+    std::vector<uint32_t> path;
+    if (prev.find(goal_id) == prev.end()) return path; // No path found
+    for (uint32_t at = goal_id; at != start_id; at = prev[at]) {
+        path.push_back(at);
+    }
+    path.push_back(start_id);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
+std::vector<uint32_t> WaypointManager::findPathBFS(uint32_t start_id, uint32_t goal_id) {
+    std::map<uint32_t, uint32_t> prev;
+    std::set<uint32_t> visited;
+    std::queue<uint32_t> q;
+
+    q.push(start_id);
+    visited.insert(start_id);
+
+    while (!q.empty()) {
+        uint32_t u = q.front(); q.pop();
+        if (u == goal_id) break;
+
+        for (const auto& v : waypoints_) {
+            if (u == v.first) continue;
+            if (visited.count(v.first)) continue;
+            // Optionally, only connect "nearby" waypoints by distance threshold
+            // double dist = calculateDistance(waypoints_[u].pose, waypoints_[v.first].pose);
+            // if (dist > SOME_THRESHOLD) continue;
+
+            prev[v.first] = u;
+            visited.insert(v.first);
+            q.push(v.first);
+        }
+    }
+
+    // Reconstruct path
+    std::vector<uint32_t> path;
+    if (prev.find(goal_id) == prev.end()) return path; // No path found
+    for (uint32_t at = goal_id; at != start_id; at = prev[at]) {
+        path.push_back(at);
+    }
+    path.push_back(start_id);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
 
 void WaypointManager::processFeedback1(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
@@ -512,7 +590,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "waypoint_manager");
     ros::NodeHandle nh;
     WaypointManager waypoint_manager(nh);
-    ros::AsyncSpinner spinner(2); // client is blocking the thread
+    ros::AsyncSpinner spinner(3); // client is blocking the thread
     spinner.start();
     ros::waitForShutdown();
     return 0;

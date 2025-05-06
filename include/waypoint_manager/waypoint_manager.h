@@ -14,6 +14,7 @@
 #include <waypoint_manager/CreateWaypoint.h>
 #include <waypoint_manager/GetWaypoints.h>
 #include <waypoint_manager/NavigateToWaypoint.h>
+#include <queue>
 #include <vector>
 #include <map>
 #include <string>
@@ -71,6 +72,8 @@ private:
     double calculateDistance(const geometry_msgs::Pose& pose1, const geometry_msgs::Pose& pose2);
     double calculateAngle(const geometry_msgs::Pose& pose1, const geometry_msgs::Pose& pose2);
     std::vector<uint32_t> findPath(uint32_t start_id, uint32_t goal_id);
+    std::vector<uint32_t> findPathDijkstra(uint32_t start_id, uint32_t goal_id);
+    std::vector<uint32_t> findPathBFS(uint32_t start_id, uint32_t goal_id);
 };
 
 #endif // WAYPOINT_MANAGER_H 
