@@ -6,7 +6,7 @@ Deliverables
 [~] = In Progress 
 [ ] = Not Started
 
-1. Source Code
+### 1. Source Code
 [✓] waypoint_manager ROS package
 [✓] Node implementation (waypoint_manager_node.cpp)
 [✓] Header files (waypoint_manager.h)
@@ -17,19 +17,19 @@ Deliverables
 [✓] Message definitions
     - Waypoint.msg
 
-2. Configuration Files
+### 2. Configuration Files
 [✓] Launch files
     - waypoint_manager.launch
     - Parameter files
     - config/params.yaml
 
-3. Documentation
+### 3. Documentation
 [✓] README.md with:
 [✓] Installation instructions
 [✓] Usage instructions
 
 
-4. Features
+### 4. Features
 [✓] waypoint creation
     - Automatic waypoint creation
     - Based on distance and angle threshold
