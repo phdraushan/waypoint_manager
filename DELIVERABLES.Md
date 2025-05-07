@@ -2,18 +2,18 @@ Deliverables
 # Waypoint Manager Project Deliverables
 
 ## Status Overview
-[✓] = Complete\
-[~] = In Progress\ 
-[ ] = Not Started\
+[✓] = Complete  
+[~] = In Progress   
+[ ] = Not Started  
 
-### 1. Source Code
-[✓] waypoint_manager ROS package
-[✓] Node implementation (waypoint_manager_node.cpp)
-[✓] Header files (waypoint_manager.h)
-[✓] Services :  definitions
-    - CreateWaypoint.srv
-    - GetWaypoints.srv
-    - NavigateToWaypoint.srv
+### 1. Source Code  
+[✓] waypoint_manager ROS package  
+[✓] Node implementation (waypoint_manager_node.cpp)  
+[✓] Header files (waypoint_manager.h)  
+[✓] Services :  definitions  
+    - CreateWaypoint.srv  
+    - GetWaypoints.srv  
+    - NavigateToWaypoint.srv  
 [✓] Message definitions
     - Waypoint.msg
 
