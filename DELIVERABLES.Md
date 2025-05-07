@@ -2,9 +2,9 @@ Deliverables
 # Waypoint Manager Project Deliverables
 
 ## Status Overview
-[✓] = Complete
-[~] = In Progress 
-[ ] = Not Started
+[✓] = Complete\
+[~] = In Progress\ 
+[ ] = Not Started\
 
 ### 1. Source Code
 [✓] waypoint_manager ROS package
