@@ -1,10 +1,15 @@
 <?xml version="1.0"?>
 <launch>
+
+    <include file="$(find start_anscer)/launch/start_anscer.launch"/>
+    <include file="$(find anscer_navigation)/launch/anscer_navigation.launch"/>
     <!-- Launch the waypoint manager node -->
     <node pkg="waypoint_manager" type="waypoint_manager_node" name="waypoint_manager" output="screen">
         <!-- Parameters -->
         <param name="position_threshold" value="0.5" />
-        <param name="distance_threshold" value="2.0" />
-        <param name="angle_threshold" value="0.785398" /> <!-- 45 degrees in radians -->
+        <param name="distance_threshold" value="5.0" />
+        <param name="angle_threshold" value="0.8" /> <!--  approx 45 degrees in radians -->
     </node>
+
+
 </launch> 
