@@ -149,12 +149,8 @@ target_link_libraries(waypoint_manager_node
   ${catkin_LIBRARIES}
   yaml-cpp #fixing for yaml-cpp dependencies
 )
-#  fixing for yaml-cpp dependencies
-add_executable(waypoint_visualizer_node src/waypoint_visualizer_node.cpp)
-target_link_libraries(waypoint_visualizer_node
-  ${catkin_LIBRARIES}
-  yaml-cpp
-)
+
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

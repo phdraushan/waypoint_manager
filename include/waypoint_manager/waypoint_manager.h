@@ -62,7 +62,6 @@ private:
                             waypoint_manager::GetWaypoints::Response& res);
     bool navigateToWaypointCallback(waypoint_manager::NavigateToWaypoint::Request& req,
                                   waypoint_manager::NavigateToWaypoint::Response& res);
-    void processFeedback1(const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback);
     void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback);
 
     // Helper functions
@@ -74,8 +73,7 @@ private:
     double calculateDistance(const geometry_msgs::Pose& pose1, const geometry_msgs::Pose& pose2);
     double calculateAngle(const geometry_msgs::Pose& pose1, const geometry_msgs::Pose& pose2);
     std::vector<uint32_t> findPath(uint32_t start_id, uint32_t goal_id);
-    std::vector<uint32_t> findPathDijkstra(uint32_t start_id, uint32_t goal_id);
-    std::vector<uint32_t> findPathBFS(uint32_t start_id, uint32_t goal_id);
+    
 };
 
 #endif // WAYPOINT_MANAGER_H 
