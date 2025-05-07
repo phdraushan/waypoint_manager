@@ -16,9 +16,12 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
     is_first_pose_(true)
 {
     // Load parameters
-    nh_.param("position_threshold", position_threshold_, 0.5);
-    nh_.param("distance_threshold", distance_threshold_, 2.0);
-    nh_.param("angle_threshold", angle_threshold_, M_PI/4.0); // 45 degrees
+    nh_.param("waypoint_manager/position_threshold", position_threshold_, 0.5);
+    nh_.param("waypoint_manager/distance_threshold", distance_threshold_, 2.0);
+    nh_.param("waypoint_manager/angle_threshold", angle_threshold_, M_PI/4.0); // 45 degrees
+
+    ROS_INFO("\n\n WaypointManager initialized with parameters: \n\n position_threshold=%f, \n\n distance_threshold=%f, \n\n angle_threshold=%f\n\n", 
+             position_threshold_, distance_threshold_, angle_threshold_);
 
     // publishers and subscribers
     odom_sub_ = nh_.subscribe("odom", 1, &WaypointManager::odomCallback, this);
