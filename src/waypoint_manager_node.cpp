@@ -54,12 +54,12 @@ WaypointManager::WaypointManager(ros::NodeHandle& nh) :
 //tested
 WaypointManager::~WaypointManager() {
     saveWaypoints();
-    // raushantodo:  check the delete function later 
+    // raushantodo:  delete marker server 
     delete marker_server_;
 }
 //tested
 
-
+    
 
 void WaypointManager::publishPointCallback(const geometry_msgs::PointStamped::ConstPtr& msg) {
     ROS_INFO("\n\n--------------------------------\n\n");
